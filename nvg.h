@@ -1,5 +1,7 @@
+#pragma once
 #include <algorithm>
 #include <random>
+
 namespace nvg {
 class Random {
  public:
