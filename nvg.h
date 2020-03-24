@@ -16,6 +16,17 @@ class Random {
     return output;
   }
 
+  template <typename T>
+  [[nodiscard]] std::vector<T> permutationVector(std::size_t n) {
+    auto v = std::vector<T>(n);
+    std::generate(v.begin(), v.end(), []() {
+      static auto value = T{};
+      return value++;
+    });
+    std::shuffle(v.begin(), v.end(), gen);
+    return v;
+  }
+
  private:
   std::mt19937 gen{std::random_device{}()};
 };
