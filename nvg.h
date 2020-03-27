@@ -52,4 +52,32 @@ class Stopwatch {
   std::chrono::high_resolution_clock::time_point startTimePoint{};
   std::chrono::high_resolution_clock::duration duration{};
 };
+
+constexpr auto defaultRepeatsPerSize = std::size_t{20};
+
+template <typename C, typename G>
+[[nodiscard]] std::vector<std::pair<std::size_t, double>> runtimeRatios(
+    const C& callable, const G& dataGenerator, std::size_t maxN,
+    std::size_t repeatsPerSize = defaultRepeatsPerSize) {
+  auto ratios = std::vector<std::pair<std::size_t, double>>{};
+  auto lastRuntime = std::chrono::milliseconds::zero().count();
+
+  for (auto n = std::size_t{1}; n < maxN; n *= 2) {
+    auto stopwatch = nvg::Stopwatch();
+    for (auto i = std::size_t{0}; i < repeatsPerSize; ++i) {
+      auto data = dataGenerator(n);
+      stopwatch.start();
+      callable(data);
+      stopwatch.stop();
+    }
+    auto currentRuntime = stopwatch.getDurationInMs() / repeatsPerSize;
+    if (lastRuntime > 0) {
+      auto ratio = static_cast<double>(currentRuntime) / lastRuntime;
+      ratios.emplace_back(n, ratio);
+    }
+    lastRuntime = currentRuntime;
+  }
+
+  return ratios;
+}
 }  // namespace nvg
