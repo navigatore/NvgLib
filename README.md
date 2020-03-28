@@ -11,4 +11,4 @@ file is in `nvg::` namespace to avoid conflicts with other libraries.
 
 ##### C++ standard
 
-You have to use C++11 (or newer) standard to compile the library.
+You have to use C++17 (or newer) standard to compile the library.

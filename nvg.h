@@ -2,18 +2,26 @@
 #include <algorithm>
 #include <chrono>
 #include <random>
+#include <type_traits>
 
 namespace nvg {
 class Random {
  public:
   template <typename T>
-  [[nodiscard]] std::vector<T> uniformVector(std::size_t n) {
-    auto output = std::vector<T>(n, 0);
-    auto maxElement = static_cast<T>(n - 1);
-    std::uniform_int_distribution<T> dis(0, maxElement);
+  [[nodiscard]] std::vector<T> uniformVector(std::size_t n, T minElement,
+                                             T maxElement) {
+    static_assert(std::is_integral_v<T>,
+                  "The type of stored values must be integral");
+    auto output = std::vector<T>(n);
+    std::uniform_int_distribution<T> dis(minElement, maxElement);
     std::generate(output.begin(), output.end(),
                   [this, &dis]() { return dis(gen); });
     return output;
+  }
+
+  template <typename T>
+  [[nodiscard]] std::vector<T> uniformVector(std::size_t n) {
+    return uniformVector(n, 0, static_cast<T>(n - 1));
   }
 
   template <typename T>
