@@ -10,20 +10,22 @@ namespace nvg {
 class Random {
  public:
   template <typename T>
-  [[nodiscard]] std::vector<T> uniformVector(std::size_t n, T minElement,
-                                             T maxElement) {
-    static_assert(std::is_integral_v<T>,
-                  "The type of stored values must be integral");
-    auto output = std::vector<T>(n);
-    std::uniform_int_distribution<T> dis(minElement, maxElement);
-    std::generate(output.begin(), output.end(),
-                  [this, &dis]() { return dis(gen); });
-    return output;
+  [[nodiscard]] std::enable_if_t<std::is_integral_v<T>, std::vector<T>>
+  uniformVector(std::size_t n, T minElement, T maxElement) {
+    auto dis = std::uniform_int_distribution<T>{minElement, maxElement};
+    return createVectorUsingDistribution<T>(n, dis);
+  }
+
+  template <typename T>
+  [[nodiscard]] std::enable_if_t<std::is_floating_point_v<T>, std::vector<T>>
+  uniformVector(std::size_t n, T minElement, T maxElement) {
+    auto dis = std::uniform_real_distribution<T>{minElement, maxElement};
+    return createVectorUsingDistribution<T>(n, dis);
   }
 
   template <typename T>
   [[nodiscard]] std::vector<T> uniformVector(std::size_t n) {
-    return uniformVector(n, 0, static_cast<T>(n - 1));
+    return uniformVector<T>(n, 0, n - 1);
   }
 
   template <typename T>
@@ -38,6 +40,14 @@ class Random {
   }
 
  private:
+  template <typename T, typename D>
+  [[nodiscard]] std::vector<T> createVectorUsingDistribution(std::size_t n,
+                                                             D& distribution) {
+    auto output = std::vector<T>(n);
+    std::generate(output.begin(), output.end(),
+                  [this, &distribution]() { return distribution(gen); });
+    return output;
+  }
   std::mt19937 gen{std::random_device{}()};
 };
 
