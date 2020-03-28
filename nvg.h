@@ -1,7 +1,9 @@
 #pragma once
 #include <algorithm>
 #include <chrono>
+#include <iostream>
 #include <random>
+#include <string>
 #include <type_traits>
 
 namespace nvg {
@@ -60,6 +62,16 @@ class Stopwatch {
   std::chrono::high_resolution_clock::time_point startTimePoint{};
   std::chrono::high_resolution_clock::duration duration{};
 };
+
+template <typename T>
+void printElementsInRange(const T first, const T last,
+                          const std::string& separator = " ",
+                          const std::string& ending = "\n") {
+  for (auto i = first; i != last; ++i) {
+    std::cout << *i << separator;
+  }
+  std::cout << ending;
+}
 
 constexpr auto defaultRepeatsPerSize = std::size_t{20};
 
